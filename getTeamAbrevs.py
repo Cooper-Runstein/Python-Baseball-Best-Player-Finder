@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup
 from contextlib import closing
 import requests
 
-url = "https://www.baseball-reference.com/about/team_IDs.shtml";
-
 def get_page(url):
     """
     Gets content at HTML if possible.
@@ -57,4 +55,10 @@ def get_from_soup(soup):
     return abrevs
 
 
-print(get_from_soup(make_soup(url)))
+def return_abreviations():
+    url = "https://www.baseball-reference.com/about/team_IDs.shtml";
+    soup = make_soup(url)
+    return get_from_soup(soup)
+
+if __name__ == "__main__":
+    return_abreviations()

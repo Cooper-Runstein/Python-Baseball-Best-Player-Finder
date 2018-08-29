@@ -1,4 +1,5 @@
 import requests as r
+from getTeamAbrevs import return_abreviations
 
 base_url = 'https://api.mysportsfeeds.com/v2.0/pull/mlb/2018/player_stats_totals.json'
 
@@ -24,19 +25,22 @@ def listify_categories(categories):
     return categories
 
 def seperate_categories(categories):
-    teams = []
-    positions = []
+    teams, positions = [], []
 
+    team_abrevs = return_abreviations()
     for cat in categories:
-        if len(cat) == 1:
+        if cat.upper() in team_abrevs:
+            teams.append(cat.upper())
+        else:
             positions.append(cat)
-        elif
+    return teams, positions
 
 
 
 def main():
     categories = str(get_inputs())
     categories = listify_categories(categories)
+    categories = seperate_categories(categories)
     print(categories)
 
 
