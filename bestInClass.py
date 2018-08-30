@@ -1,9 +1,8 @@
-import requests as r
+import requests
+import base64
 from getTeamAbrevs import return_abreviations
 
 base_url = 'https://api.mysportsfeeds.com/v2.0/pull/mlb/2018/player_stats_totals.json'
-
-# r.get()
 
 def get_inputs():
     category = input('Choose a class, or set of classes of Baseball Player, or type 0 for options/help: ')
@@ -62,12 +61,30 @@ def main():
         main()
     else:
         stats = get_stats()
-        run_requests(stats, categories)
+        requested_players = run_requests(stats, categories)
+        print(return_leaders)
 
+def req():
+    stats = ["H"]
+    response = requests.get(
+            url='https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team=NYY&position=2B',
+            headers={
+                "Authorization": "Basic " + base64.b64encode(({KEY:PASS}).encode('utf-8')).decode('ascii')
+            }
+        )
+    res = response.json()
+    results = []
+    for player in res['cumulativeplayerstats']['playerstatsentry']:
+        new_player  = {}
+        new_player['name'] = (player["player"]['FirstName'], player["player"]['LastName'])
+        new_player['stats'] = (player["stats"])
+        results.append(new_player)
 
-
-
-
+    for player in results:
+        print(player['name'])
+        for statname, statatrs in player['stats'].items():
+            if statatrs['@abbreviation'] in stats:
+                print('{}: {}'.format(statname, statatrs['#text']))
 
 if __name__ == "__main__":
-    main()
+    req()
