@@ -52,7 +52,7 @@ def run_requests(stats, categories):
                 url='https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team={}&position={}'
                     .format(teams_string, positions_string),
                 headers={
-                    "Authorization": "Basic " + base64.b64encode(('a1905963-e406-49d5-93bd-2e9105:CYPhaipisButsE7').encode('utf-8')).decode('ascii')
+                    "Authorization": "Basic " + base64.b64encode(('').encode('utf-8')).decode('ascii')
                 }
             )
     except requests.exceptions.RequestException as e:
