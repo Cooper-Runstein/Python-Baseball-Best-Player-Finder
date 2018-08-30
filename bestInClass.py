@@ -2,6 +2,7 @@ import requests
 import base64
 import sys
 from getTeamAbrevs import return_abreviations
+from API_KEY import API_KEY
 
 def get_inputs():
     category = str(input('Choose a class, or set of classes of Baseball Player, or type 0 for options/help: '))
@@ -25,12 +26,19 @@ def seperate_categories(categories):
     teams, positions = [], []
     print("Processing Inputs...")
     team_abrevs = return_abreviations()
+    team_abrevs.append('KC')
     for cat in categories:
         if cat.upper() in team_abrevs:
-            teams.append(cat.upper())
+            cat = api_format_teams(cat)
+            teams.append(cat)
         else:
             positions.append(cat)
     return {'teams': teams, 'positions': positions}
+
+def api_format_teams(team_abrev):
+    if team_abrev.upper() == 'KCR':
+        return 'KC'
+    return team_abrev.upper()
 
 def prepare_categories():
     categories = str(get_inputs())
@@ -52,7 +60,7 @@ def run_requests(stats, categories):
                 url='https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team={}&position={}'
                     .format(teams_string, positions_string),
                 headers={
-                    "Authorization": "Basic " + base64.b64encode(('').encode('utf-8')).decode('ascii')
+                    "Authorization": "Basic " + base64.b64encode((API_KEY()).encode('utf-8')).decode('ascii')
                 }
             )
     except requests.exceptions.RequestException as e:
@@ -65,24 +73,30 @@ def run_requests(stats, categories):
         print("Sorry, the API appears to not be working right now. Try again later.")
         sys.exit(1)
     results = []
-    for player in res['cumulativeplayerstats']['playerstatsentry']:
-        new_player  = {}
-        new_player['name'] = (player["player"]['FirstName'], player["player"]['LastName'])
-        stat_dict = {}
-        for statname, statatrs in player['stats'].items():
-            if statatrs['@abbreviation'] in stats:
-                stat_dict[statname]=  statatrs['#text']
-        new_player['stats'] = stat_dict
-        results.append(new_player)
+    try:
+        for player in res['cumulativeplayerstats']['playerstatsentry']:
+            new_player  = {}
+            new_player['name'] = (player["player"]['FirstName'], player["player"]['LastName'])
+            stat_dict = {}
+            for statname, statatrs in player['stats'].items():
+                if statatrs['@abbreviation'] in stats:
+                    stat_dict[statname]=  statatrs['#text']
+            new_player['stats'] = stat_dict
+            results.append(new_player)
+    except KeyError:
+        return False
 
     return results
 
 def get_leaders(players):
     if len(players) == 0:
-        print('there are no players that fit your search parameters')
+        return False
     elif len(players) == 1:
+        leader_dict = {}
         for statkey, statvalue in players[0]['stats'].items():
-            print('Leader in {} -> {}: {}'.format(statkey, players[0]['name'], statvalue))
+            leader_dict[statkey] = players[0]['name'], players[0]['stats'][statkey]
+        return leader_dict
+
     else:
         initial_player = players[0]
         leader_dict = {}
@@ -110,8 +124,11 @@ def main():
     else:
         stats = get_stats()
         requested_players = run_requests(stats, categories)
-        for statkey, statvalue in get_leaders(requested_players).items():
-            print('{} leader: {}: {}'.format(statkey, ' '.join(statvalue[0]), statvalue[1]))
+        if requested_players:
+            for statkey, statvalue in get_leaders(requested_players).items():
+                print('{} leader: {}: {}'.format(statkey, ' '.join(statvalue[0]), statvalue[1]))
+        else:
+            print("Sorry, no players fit your search parameters")
 
 
 
