@@ -16,13 +16,12 @@ def get_inputs():
     else:
         return category
 
-def listify_categories(categories):
-    categories = categories.replace(' ', ',')
-    categories = categories.replace(',,', ',')
-    categories = categories.split(',')
-    categories = list(filter(lambda cat: 0 < len(cat) < 4, categories))
-
-    return categories
+def listify(input_string):
+    modified_string = input_string.replace(' ', ',')
+    modified_string = modified_string.replace(',,', ',')
+    listed_inputs = modified_string.split(',')
+    filtered_list = list(filter(lambda input: 0 < len(input) < 4, listed_inputs))
+    return filtered_list
 
 def seperate_categories(categories):
     teams, positions = [], []
@@ -33,15 +32,39 @@ def seperate_categories(categories):
             teams.append(cat.upper())
         else:
             positions.append(cat)
-    return teams, positions
+    return {'teams': teams, 'positions': positions}
 
+def prepare_categories():
+    categories = str(get_inputs())
+    categories = listify(categories)
+    categories = seperate_categories(categories)
+    return categories
+
+def get_stats():
+    stats = input("Enter list of stats to search: ")
+    stats = listify(stats)
+    return stats
+
+def run_requests(stats, categories):
+    print(stats, categories)
+    print("Running requests")
 
 
 def main():
-    categories = str(get_inputs())
-    categories = listify_categories(categories)
-    categories = seperate_categories(categories)
-    print(categories)
+    categories = prepare_categories()
+    teams_string = ', '.join(categories['teams'])
+    positions_string = ', '.join(categories['positions'])
+    print(teams_string)
+    confirm_categories = input(
+        'Search Parameters: Teams: {} Positions: {}. Is this correct? Y/n.'
+        .format(teams_string, positions_string))
+    if confirm_categories.lower() == str('No') or confirm_categories.lower() == str('n'):
+        main()
+    else:
+        stats = get_stats()
+        run_requests(stats, categories)
+
+
 
 
 
