@@ -38,6 +38,8 @@ def seperate_categories(categories):
 def api_format_teams(team_abrev):
     if team_abrev.upper() == 'KCR':
         return 'KC'
+    elif team_abrev.upper() == 'SFG':
+        return 'SF'
     return team_abrev.upper()
 
 def prepare_categories():
@@ -46,10 +48,14 @@ def prepare_categories():
     categories = seperate_categories(categories)
     return categories
 
-def get_stats():
-    stats = input("Enter list of stats to search: ")
+def process_stats(stats):
     stats = listify(stats)
     return stats
+
+def get_stats():
+    stats = input("Enter list of stats to search: ")
+    return stats
+
 
 def run_requests(stats, categories):
     print("Running requests...")
@@ -89,6 +95,12 @@ def run_requests(stats, categories):
     return results
 
 def get_leaders(players):
+
+    try:
+        list(players)
+    except TypeError:
+        return False
+
     if len(players) == 0:
         return False
     elif len(players) == 1:
@@ -122,7 +134,7 @@ def main():
     if confirm_categories.lower() == str('No') or confirm_categories.lower() == str('n'):
         main()
     else:
-        stats = get_stats()
+        stats = process_stats()
         requested_players = run_requests(stats, categories)
         if requested_players:
             for statkey, statvalue in get_leaders(requested_players).items():
