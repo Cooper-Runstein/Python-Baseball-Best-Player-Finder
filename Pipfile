@@ -9,6 +9,7 @@ name = "pypi"
 "beautifulsoup4" = "*"
 requests = "*"
 coverage = "*"
+httpretty = "*"
 
 [requires]
 python_version = "3.5"

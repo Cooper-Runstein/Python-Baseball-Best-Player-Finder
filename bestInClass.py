@@ -40,6 +40,8 @@ def api_format_teams(team_abrev):
         return 'KC'
     elif team_abrev.upper() == 'SFG':
         return 'SF'
+    elif team_abrev.upper() == 'TBR':
+        return 'TB'
     return team_abrev.upper()
 
 def prepare_categories():
@@ -50,37 +52,48 @@ def prepare_categories():
 
 def process_stats(stats):
     stats = listify(stats)
+    stats = list(stat.upper() for stat in stats)
     return stats
 
 def get_stats():
     stats = input("Enter list of stats to search: ")
     return stats
 
+def request(teams_string, positions_string):
+    response = requests.get(
+            url='https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team={}&position={}'
+                .format(teams_string, positions_string),
+            headers={
+                "Authorization": "Basic " + base64.b64encode((API_KEY()).encode('utf-8')).decode('ascii')
+            }
+        )
+    return response
 
 def run_requests(stats, categories):
+    """
+    Takes an array of stats to search for and a categories dictionary
+    Categories object contains list teams and array positions
+    Returns a list of player objects
+    Each player object has a 'name' tuple and stats dictionary of relevant stats
+    """
+
     print("Running requests...")
     teams_string = ','.join(categories['teams'])
     positions_string = ','.join(categories['positions'])
     try:
-        response = requests.get(
-                url='https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team={}&position={}'
-                    .format(teams_string, positions_string),
-                headers={
-                    "Authorization": "Basic " + base64.b64encode((API_KEY()).encode('utf-8')).decode('ascii')
-                }
-            )
+        response = request(teams_string, positions_string)
     except requests.exceptions.RequestException as e:
-        print(e)
+        print("REQUEST ERROR: ",  e)
         sys.exit(1)
     if response.status_code == 200:
-        res = response.json()
+        response = response.json()
         print('Processing results...')
     else:
         print("Sorry, the API appears to not be working right now. Try again later.")
         sys.exit(1)
     results = []
     try:
-        for player in res['cumulativeplayerstats']['playerstatsentry']:
+        for player in response['cumulativeplayerstats']['playerstatsentry']:
             new_player  = {}
             new_player['name'] = (player["player"]['FirstName'], player["player"]['LastName'])
             stat_dict = {}
@@ -95,7 +108,6 @@ def run_requests(stats, categories):
     return results
 
 def get_leaders(players):
-
     try:
         list(players)
     except TypeError:
@@ -134,7 +146,7 @@ def main():
     if confirm_categories.lower() == str('No') or confirm_categories.lower() == str('n'):
         main()
     else:
-        stats = process_stats()
+        stats = process_stats(get_stats())
         requested_players = run_requests(stats, categories)
         if requested_players:
             for statkey, statvalue in get_leaders(requested_players).items():

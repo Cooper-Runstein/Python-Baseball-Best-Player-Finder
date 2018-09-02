@@ -1,5 +1,6 @@
 import unittest
-
+import httpretty
+import json
 from unittest.mock import patch
 
 import bestInClass
@@ -110,9 +111,62 @@ class TestPrepare(unittest.TestCase):
 
 class TestProcessStats(unittest.TestCase):
     def setUp(self):
-        self.stats = 'HR'
+        self.stat = 'HR'
+        self.stats = 'HR, H'
+        self.lower = 'h'
+        self.extra_space = '  h , HR'
     def test_one_stat(self):
-        assert bestInClass.process_stats(self.stats) == ['HR']
+        assert bestInClass.process_stats(self.stat) == ['HR']
+    def test_two_stat(self):
+        assert bestInClass.process_stats(self.stats) == ['HR', 'H']
+    def test_lower_case(self):
+        assert bestInClass.process_stats(self.lower) == ['H']
+    def test_extra_space(self):
+        assert bestInClass.process_stats(self.extra_space) == ['H', 'HR']
+
+class TestRequests(unittest.TestCase):
+    def setUp(self):
+        self.data = {
+        	"cumulativeplayerstats": {
+        		"playerstatsentry": [{
+        			"player": {
+        				"ID": "10306",
+        				"LastName": "Ortiz",
+        				"FirstName": "David",
+        				"JerseyNumber": "34",
+        				"Position": "DH"
+        			},
+        			"stats": {
+        				"GamesPlayed": {
+        					"@abbreviation": "G",
+        					"#text": "71"
+        				},
+        				"Homeruns": {
+        					"@category": "Batting",
+        					"@abbreviation": "HR",
+        					"#text": "18"
+        				}
+        			}
+        		}]
+        	}
+        }
+    @httpretty.activate
+    def test_valid_request(self):
+        httpretty.register_uri(httpretty.GET,
+                                "https://api.mysportsfeeds.com/v1.2/pull/mlb/2018-regular/cumulative_player_stats.json?team=BOS&position=DH",
+                                body= json.dumps(self.data),
+                                content_type="application/json",
+                                )
+        assert bestInClass.run_requests(['HR'], {'teams': ['BOS'], 'positions': ['DH']}) == [
+                                        {
+                                            "name": ("David", "Ortiz"),
+                                            "stats": {"Homeruns": "18"}
+                                         }]
+
+        httpretty.disable()
+        httpretty.reset()
+
+
 
 if __name__ == '__main__':
     unittest.main()
