@@ -140,9 +140,18 @@ def main():
     categories = prepare_categories()
     teams_string = ', '.join(categories['teams'])
     positions_string = ', '.join(categories['positions'])
+
+    if len(categories['teams']) == 0:
+        teams_string = 'any teams'
+
+    if len(categories['positions']) == 0:
+        positions_string = 'any position'
+        
     confirm_categories = input(
-        'Search Parameters: Teams: {} Positions: {}. Is this correct? Y/n.'
-        .format(teams_string, positions_string))
+        'Search Parameters: Players that play positions: {} for {}. Is this correct? Y/n.'
+        .format(positions_string, teams_string))
+
+
     if confirm_categories.lower() == str('No') or confirm_categories.lower() == str('n'):
         main()
     else:

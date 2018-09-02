@@ -36,6 +36,9 @@ class ApiFormatTests(unittest.TestCase):
     def test_SF(self):
         assert bestInClass.api_format_teams('SFG') == 'SF'
 
+    def test_TB(self):
+        assert bestInClass.api_format_teams('TBR') == 'TB'
+
 class GetLeadersTests(unittest.TestCase):
     def setUp(self):
         self.players1Stat= [
