@@ -2,7 +2,16 @@ import requests
 import base64
 import sys
 from getTeamAbrevs import return_abreviations
-from API_KEY import API_KEY
+
+
+def check_for_key():
+    try:
+        from API_KEY import API_KEY
+    except ImportError:
+        print('Please Obtain an API key from https://www.mysportsfeeds.com/, or send me an email to see this project in action.')
+        print('Once an API Key has been obtained, a file named API_KEY should be created with a function of the same name that returns the API key as a string.')
+        print("Once this is completed, this project should wordk.")
+        sys.exit(0)
 
 def get_inputs():
     category = str(input('Choose a class, or set of classes of Baseball Player, or type 0 for options/help: '))
@@ -137,6 +146,7 @@ def get_leaders(players):
 
 
 def main():
+    check_for_key()
     categories = prepare_categories()
     teams_string = ', '.join(categories['teams'])
     positions_string = ', '.join(categories['positions'])
@@ -146,7 +156,7 @@ def main():
 
     if len(categories['positions']) == 0:
         positions_string = 'any position'
-        
+
     confirm_categories = input(
         'Search Parameters: Players that play positions: {} for {}. Is this correct? Y/n.'
         .format(positions_string, teams_string))
