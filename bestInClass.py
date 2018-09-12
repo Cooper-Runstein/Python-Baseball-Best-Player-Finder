@@ -45,13 +45,12 @@ def seperate_categories(categories):
     return {'teams': teams, 'positions': positions}
 
 def api_format_teams(team_abrev):
-    if team_abrev.upper() == 'KCR':
-        return 'KC'
-    elif team_abrev.upper() == 'SFG':
-        return 'SF'
-    elif team_abrev.upper() == 'TBR':
-        return 'TB'
-    return team_abrev.upper()
+    common_abrevs = {
+        'KCR': 'KC',
+        'SFG': 'SF',
+        'TBR': 'TB'
+    }
+    return common_abrevs.get(team_abrev.upper(), team_abrev.upper())
 
 def prepare_categories():
     categories = str(get_inputs())
