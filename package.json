@@ -4,7 +4,9 @@
   "description": "Plain python module to be used to find the best player at a given stat in a given collection. BestInClass.py is main module. getTeamAbrevs returns standard team abbreviations",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "python python/tests.py && jest",
+    "py-test": "python python/tests.py",
+    "js-test": "jest"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   "homepage": "https://github.com/Cooper-Runstein/Python-Baseball-Best-Player-Finder#readme",
   "dependencies": {
     "electron": "^3.0.9",
+    "jest": "^23.6.0",
     "prettier": "^1.15.2",
     "python-shell": "^1.0.6"
   }
