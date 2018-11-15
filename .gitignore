@@ -1,3 +1,5 @@
 API_KEY.py
 htmlcov
 .coverage
+
+node_modules
