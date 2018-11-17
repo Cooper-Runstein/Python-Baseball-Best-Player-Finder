@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/cooperrunstein/.local/share/virtualenvs/Python-Baseball-Best-Player-Finder-d_UehOq8/bin/python"
+    "python.pythonPath": "/Users/cooperrunstein/.local/share/virtualenvs/Python-Baseball-Best-Player-Finder-d_UehOq8/bin/python",
+    "python.formatting.provider": "black"
 }

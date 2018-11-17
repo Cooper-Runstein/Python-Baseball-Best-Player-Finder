@@ -51,35 +51,12 @@ def get_from_soup(soup):
         text = stat.get_text()
         leaders[i]["stat"] = text
 
-    for item in leaders:
-        print({item["stat"]: item["player"]})
+    return leaders
 
-    # for i, tr in enumerate():
-    #     print({i: tr})
-    #     print("\n")
-    #print()
-    # """
-    # parse html and get Team_abbreviations
-    # """
-    # abrevs = []
-    # for i, tr in enumerate(soup.select('tr')):
-    #     tr = str(tr)
-    #     tr = tr.replace('<tr>', '')
-    #     tr = tr.replace('</tr>', '')
-    #     tr = tr.replace('</td>', '')
-    #     tr = tr.split('<td>')
-    #     tr = tr[1:]
-    #     abrevs.append(tr)
-
-    # abrevs = list(filter(lambda x: x[-1] == 'Present', abrevs))
-    # abrevs = list(map(lambda x: x[1], abrevs))
-    # return abrevs
-
-
-def return_abreviations(team):
+def return_leaders(team):
     url = f"http://www.espn.com/mlb/team/stats/pitching/_/name/{team}"
     soup = make_soup(url)
     return get_from_soup(soup)
 
 if __name__ == "__main__":
-    return_abreviations('bos')
+    return_leaders('bos')
